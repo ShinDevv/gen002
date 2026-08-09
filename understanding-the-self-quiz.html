@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Know Thyself — A Self-Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Spectral:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2430;
+    --ink-deep:#141C26;
+    --paper:#F3ECDA;
+    --paper-dim:#E9E0C9;
+    --paper-line:#D8CBA9;
+    --gold:#B8863B;
+    --gold-soft:#D8AE6C;
+    --sage:#5F7A5A;
+    --sage-soft:#E4EBDF;
+    --rust:#A6503F;
+    --rust-soft:#F1DFD9;
+    --text-ink:#2A2420;
+    --text-ink-soft:#5B5347;
+    --text-paper:#EDE6D6;
+    --text-paper-dim:#9BA5B4;
+    --shadow: 0 30px 60px -25px rgba(0,0,0,0.55);
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse at 20% -10%, #232F3F 0%, transparent 55%),
+      radial-gradient(ellipse at 100% 110%, #202B39 0%, transparent 50%),
+      var(--ink);
+    font-family:'Spectral', Georgia, serif;
+    color: var(--text-paper);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 40px 18px;
+  }
+
+  .stage{
+    width:100%;
+    max-width: 640px;
+  }
+
+  /* ---------- Header ---------- */
+  .masthead{
+    text-align:center;
+    margin-bottom: 26px;
+    position:relative;
+  }
+  .masthead .glyph{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size:15px;
+    letter-spacing:0.08em;
+    color: var(--gold-soft);
+    opacity:0.85;
+    display:block;
+    margin-bottom:6px;
+  }
+  .masthead h1{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:600;
+    font-size: 40px;
+    line-height:1.05;
+    margin:0;
+    color: var(--text-paper);
+    letter-spacing:0.01em;
+  }
+  .masthead p{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color: var(--text-paper-dim);
+    margin:10px 0 0;
+  }
+
+  /* ---------- Module rail (Roman numerals I–V) ---------- */
+  .rail{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin: 22px 0 26px;
+  }
+  .rail .tab{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid rgba(237,230,214,0.18);
+    color: var(--text-paper-dim);
+    transition: all .3s ease;
+  }
+  .rail .tab.done{
+    background: var(--sage);
+    border-color: var(--sage);
+    color: var(--sage-soft);
+  }
+  .rail .tab.active{
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--ink-deep);
+    transform: scale(1.12);
+  }
+
+  /* ---------- Card ---------- */
+  .card{
+    background: var(--paper);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    padding: 34px 34px 28px;
+    position:relative;
+    overflow:hidden;
+  }
+  .card::before{
+    content:"";
+    position:absolute;
+    left:0; top:0; bottom:0;
+    width:5px;
+    background: linear-gradient(180deg, var(--gold), var(--sage));
+  }
+
+  .tag-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:18px;
+    padding-bottom:14px;
+    border-bottom: 1px dashed var(--paper-line);
+  }
+  .tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color: var(--gold);
+    font-weight:500;
+  }
+  .counter{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    color: var(--text-ink-soft);
+  }
+
+  .question{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:600;
+    font-size: 25px;
+    line-height:1.32;
+    color: var(--text-ink);
+    margin: 0 0 22px;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .opt{
+    text-align:left;
+    font-family:'Spectral', Georgia, serif;
+    font-size:15.5px;
+    color: var(--text-ink);
+    background: #fff;
+    border:1px solid var(--paper-line);
+    border-radius:5px;
+    padding:13px 16px;
+    cursor:pointer;
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    transition: border-color .15s ease, background .15s ease, transform .1s ease;
+  }
+  .opt .letter{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color: var(--gold);
+    border:1px solid var(--gold-soft);
+    border-radius:50%;
+    width:20px;height:20px;
+    min-width:20px;
+    display:flex; align-items:center; justify-content:center;
+    margin-top:1px;
+  }
+  .opt:hover:not(:disabled){
+    border-color: var(--gold);
+    background: #fffdf6;
+  }
+  .opt:disabled{ cursor:default; }
+  .opt.correct{
+    background: var(--sage-soft);
+    border-color: var(--sage);
+  }
+  .opt.correct .letter{
+    background: var(--sage);
+    border-color: var(--sage);
+    color:#fff;
+  }
+  .opt.wrong{
+    background: var(--rust-soft);
+    border-color: var(--rust);
+  }
+  .opt.wrong .letter{
+    background: var(--rust);
+    border-color: var(--rust);
+    color:#fff;
+  }
+  .opt.dim{ opacity:0.55; }
+
+  .explain{
+    margin-top:18px;
+    background: var(--paper-dim);
+    border-left: 3px solid var(--gold);
+    padding: 13px 16px;
+    font-size:13.5px;
+    line-height:1.55;
+    color: var(--text-ink-soft);
+    border-radius: 0 4px 4px 0;
+    display:none;
+  }
+  .explain.show{ display:block; }
+  .explain b{ color: var(--text-ink); }
+
+  .foot-row{
+    display:flex;
+    justify-content:flex-end;
+    margin-top:22px;
+  }
+  .next-btn{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    background: var(--ink);
+    color: var(--text-paper);
+    border:none;
+    padding:11px 20px;
+    border-radius:4px;
+    cursor:pointer;
+    display:none;
+    align-items:center;
+    gap:8px;
+    transition: background .15s ease;
+  }
+  .next-btn.show{ display:inline-flex; }
+  .next-btn:hover{ background:#0F1720; }
+
+  /* ---------- Results ---------- */
+  .results{ display:none; }
+  .results.show{ display:block; }
+  .quiz-wrap.hide{ display:none; }
+
+  .score-figure{
+    text-align:center;
+    padding: 6px 0 24px;
+  }
+  .score-figure .num{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:600;
+    font-size:76px;
+    color: var(--text-ink);
+    line-height:1;
+  }
+  .score-figure .num span{ font-size:32px; color: var(--text-ink-soft); }
+  .score-figure .verdict{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color: var(--gold);
+    margin-top:8px;
+  }
+
+  .breakdown{ display:flex; flex-direction:column; gap:12px; margin: 10px 0 26px; }
+  .b-row{ display:flex; align-items:center; gap:12px; }
+  .b-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    color: var(--text-ink-soft);
+    width:140px;
+    min-width:140px;
+  }
+  .b-track{
+    flex:1;
+    height:8px;
+    background: var(--paper-line);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  .b-fill{
+    height:100%;
+    background: linear-gradient(90deg, var(--gold), var(--sage));
+    border-radius:4px;
+  }
+  .b-frac{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    color: var(--text-ink-soft);
+    width:34px;
+    text-align:right;
+  }
+
+  .retry-btn{
+    width:100%;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    background: var(--ink);
+    color: var(--text-paper);
+    border:none;
+    padding:14px;
+    border-radius:4px;
+    cursor:pointer;
+  }
+  .retry-btn:hover{ background:#0F1720; }
+
+  @media (max-width:480px){
+    .card{ padding:26px 20px 22px; }
+    .masthead h1{ font-size:32px; }
+    .question{ font-size:21px; }
+    .score-figure .num{ font-size:58px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <div class="masthead">
+    <span class="glyph">γνῶθι σεαυτόν</span>
+    <h1>Know Thyself</h1>
+    <p>A Self‑Quiz · Modules I–V</p>
+  </div>
+
+  <div class="rail" id="rail"></div>
+
+  <div class="quiz-wrap" id="quizWrap">
+    <div class="card">
+      <div class="tag-row">
+        <span class="tag" id="qTag">Module I · Philosophy</span>
+        <span class="counter" id="qCounter">01 / 25</span>
+      </div>
+      <p class="question" id="qText">Loading…</p>
+      <div class="options" id="qOptions"></div>
+      <div class="explain" id="qExplain"></div>
+      <div class="foot-row">
+        <button class="next-btn" id="nextBtn">Next fragment →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="card">
+      <div class="score-figure">
+        <div class="num" id="scoreNum">0<span>/25</span></div>
+        <div class="verdict" id="verdict">—</div>
+      </div>
+      <div class="breakdown" id="breakdown"></div>
+      <button class="retry-btn" id="retryBtn">Examine the self again</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  // ---------------- MODULE I: PHILOSOPHY ----------------
+  {
+    module: "I", subject: "Socrates",
+    q: "Socrates famously declared that a certain kind of life is “not worth living.” Which kind?",
+    options: ["The unreflective life", "The unexamined life", "The uneducated life", "The unambitious life"],
+    correct: 1,
+    explain: "Socrates' core claim was that <b>“the unexamined life is not worth living”</b> — self-reflection and questioning one's beliefs are the goal of philosophy itself."
+  },
+  {
+    module: "I", subject: "Socrates",
+    q: "For Socrates, knowing others is called wisdom. What does he call knowing oneself?",
+    options: ["Virtue", "Enlightenment", "Discipline", "Power"],
+    correct: 1,
+    explain: "Socrates distinguished the two: <b>knowing others is wisdom</b>, while <b>knowing the self is enlightenment</b> — and self-knowledge leads to the highest bliss."
+  },
+  {
+    module: "I", subject: "Plato",
+    q: "In Plato's dualistic view of the self, which component is described as the true locus of knowledge because it transcends the sensory world?",
+    options: ["The material body", "The immaterial mind/soul", "The physical senses", "The appetites"],
+    correct: 1,
+    explain: "Plato held that the <b>immaterial mind/soul</b> exists before birth and after death, making it the true seat of knowledge, unlike the mortal, sensory body."
+  },
+  {
+    module: "I", subject: "Plato",
+    q: "In Plato's charioteer metaphor, Reason plays the role of the charioteer. What do the two horses represent?",
+    options: [
+      "Logic and memory",
+      "Will/Spirit and Appetites/Desires",
+      "The body and the soul",
+      "Wisdom and enlightenment"
+    ],
+    correct: 1,
+    explain: "The charioteer (Reason) tries to guide two horses: <b>Will/Spirit</b> (emotions like love, anger, ambition) and <b>Appetites/Desires</b> (physical urges). Disharmony between them creates inner conflict."
+  },
+  {
+    module: "I", subject: "Aristotle",
+    q: "Aristotle's “knife analogy” illustrates his view of the soul. What point does it make?",
+    options: [
+      "The soul is a separate, immortal entity",
+      "The soul is the activity/essence of a living thing, inseparable from its function",
+      "The soul is purely emotional",
+      "The soul exists independently of the body before birth"
+    ],
+    correct: 1,
+    explain: "If a knife were alive, “cutting” would be its soul — <b>once the knife is destroyed, cutting stops</b>. For Aristotle, the soul is the essence/activity of a living being, not a separate immortal thing."
+  },
+  {
+    module: "I", subject: "St. Augustine",
+    q: "St. Augustine described an ongoing internal battle within the self. Between what two forces?",
+    options: [
+      "Reason and appetite",
+      "The 'I' and the 'Me'",
+      "Flesh (earthly desires) and spirit (spiritual fulfillment)",
+      "Mind and body as equals"
+    ],
+    correct: 2,
+    explain: "Augustine merged Christian theology with philosophy, viewing the self as flawed by Original Sin and caught in a struggle between <b>flesh and spirit</b>, resolved only through divine grace."
+  },
+  {
+    module: "I", subject: "Descartes",
+    q: "“Cogito, ergo sum” (I think, therefore I am) is central to which philosopher's view of the self?",
+    options: ["Aristotle", "René Descartes", "Plato", "Socrates"],
+    correct: 1,
+    explain: "Descartes proposed <b>mind–body dualism</b>: the self is a thinking mind distinct from the physical body, with consciousness as proof of existence."
+  },
+
+  // ---------------- MODULE II: SOCIOLOGY ----------------
+  {
+    module: "II", subject: "Sociology",
+    q: "Studies of feral children — raised isolated from human contact — are used to demonstrate what?",
+    options: [
+      "That personality is entirely genetic",
+      "The dramatic impact that the absence of socialization has on human development",
+      "That language develops without any social input",
+      "That the self forms immediately at birth"
+    ],
+    correct: 1,
+    explain: "Feral children show how essential social contact is: <b>without socialization, human development is dramatically impaired</b>, supporting the sociological view that the self is socially shaped."
+  },
+  {
+    module: "II", subject: "Cooley",
+    q: "Charles Horton Cooley's “Looking-Glass Self” proposes that our self-concept is built primarily on:",
+    options: [
+      "Our innate personality traits",
+      "How we perceive others view us",
+      "Our economic status",
+      "Our religious upbringing"
+    ],
+    correct: 1,
+    explain: "The Looking-Glass Self explains that <b>self-concept is built on how we perceive others viewing us</b> — others act as a social 'mirror.'"
+  },
+  {
+    module: "II", subject: "Cooley",
+    q: "What is the correct order of Cooley's 3-step Looking-Glass Self process?",
+    options: [
+      "Interpretation → Imagination → Self-Evaluation",
+      "Imagination → Interpretation → Self-Evaluation",
+      "Self-Evaluation → Imagination → Interpretation",
+      "Imagination → Self-Evaluation → Interpretation"
+    ],
+    correct: 1,
+    explain: "The process runs: <b>Imagination</b> (how we appear to others) → <b>Interpretation</b> (their reactions) → <b>Self-Evaluation</b> (forming self-concept from those interpreted judgments)."
+  },
+
+  // ---------------- MODULE III: ANTHROPOLOGY ----------------
+  {
+    module: "III", subject: "Institutions",
+    q: "Which of the five core social institutions is described as the 'primary socialization agent' and the oldest social institution?",
+    options: ["Education", "Religion", "Family", "Government"],
+    correct: 2,
+    explain: "<b>Family</b> is the primary unit of society and the oldest social institution — it's the primary socialization agent teaching core values and cultural norms."
+  },
+  {
+    module: "III", subject: "Institutions",
+    q: "The IPRA law and NCIP, which empower Indigenous Peoples in the Philippines to celebrate their traditions, are an example of which institution's impact on identity?",
+    options: ["Economy", "Government", "Education", "Family"],
+    correct: 1,
+    explain: "<b>Government</b> establishes rules and laws that define civic rights and legal identity — IPRA/NCIP is the reviewer's example of this at work."
+  },
+  {
+    module: "III", subject: "Cultural Acquisition",
+    q: "A Filipino child learning to perform “pagmamano” to show respect to elders is an example of:",
+    options: ["Acculturation", "Assimilation", "Enculturation", "Reciprocal determinism"],
+    correct: 2,
+    explain: "<b>Enculturation</b> is internalizing one's native culture — learning pagmamano is the reviewer's specific example."
+  },
+  {
+    module: "III", subject: "Cultural Acquisition",
+    q: "Filipinos embracing Korean BBQ (samgyeopsal) alongside traditional cuisine, blending two cultures, is an example of:",
+    options: ["Assimilation", "Acculturation", "Enculturation", "Role-taking"],
+    correct: 1,
+    explain: "<b>Acculturation</b> is cultural modification from continuous contact between cultures, producing a blend — the samgyeopsal craze is the reviewer's example."
+  },
+  {
+    module: "III", subject: "Cultural Acquisition",
+    q: "When Filipino youth fully adopt Western clothing and pop culture at the cost of their original cultural identity, this is called:",
+    options: ["Enculturation", "Acculturation", "Assimilation", "Socialization"],
+    correct: 2,
+    explain: "<b>Assimilation</b> means adopting the dominant/host culture completely, often suppressing or losing one's original cultural identity."
+  },
+  {
+    module: "III", subject: "Institutions",
+    q: "According to the reviewer, job losses during an economic crisis mainly illustrate the impact on identity of which institution?",
+    options: ["Economy", "Religion", "Education", "Government"],
+    correct: 0,
+    explain: "The <b>economy</b> regulates production, exchange, and employment — job loss during a crisis can decrease self-worth and trigger insecurity."
+  },
+
+  // ---------------- MODULE IV: PSYCHOLOGY (MEAD) ----------------
+  {
+    module: "IV", subject: "Mead",
+    q: "George Herbert Mead's Theory of Social Behaviorism asserts that the self is:",
+    options: [
+      "Innate and present at birth",
+      "Not innate — it develops entirely through social interaction and symbolic communication",
+      "Determined solely by biology",
+      "Fixed once childhood ends"
+    ],
+    correct: 1,
+    explain: "For Mead, the self is <b>not innate</b>; it develops entirely through social interactions, symbolic communication, and shared experiences."
+  },
+  {
+    module: "IV", subject: "Mead",
+    q: "In Mead's framework, which term refers to the socialized self — formed by internalizing social expectations, rules, and norms?",
+    options: ["The 'I'", "The 'Me'", "The Looking-Glass", "The Ego"],
+    correct: 1,
+    explain: "The <b>“Me”</b> is the socialized self shaped by internalized norms, while the <b>“I”</b> is the spontaneous, impulsive, un-socialized aspect."
+  },
+  {
+    module: "IV", subject: "Mead",
+    q: "Interpreting shared symbols such as language, gestures, and social cues to create identity is called:",
+    options: ["Role-taking", "Symbolic Interactionism", "Reciprocal determinism", "Self-efficacy"],
+    correct: 1,
+    explain: "<b>Symbolic Interactionism</b> is the idea that identity is created through interpreting shared symbols like language and gestures."
+  },
+  {
+    module: "IV", subject: "Mead",
+    q: "The ability to anticipate how others think or react by putting oneself in their perspective is called:",
+    options: ["Self-efficacy", "Observational learning", "Role-taking", "Enculturation"],
+    correct: 2,
+    explain: "<b>Role-taking</b> fosters empathy, self-awareness, and social cooperation by letting a person anticipate others' perspectives."
+  },
+
+  // ---------------- MODULE V: BANDURA ----------------
+  {
+    module: "V", subject: "Bandura",
+    q: "Bandura's concept of Reciprocal Determinism describes the relationship between which three factors?",
+    options: [
+      "Family, religion, and government",
+      "Behavior, internal cognitive/personal factors, and environmental influences",
+      "The 'I', the 'Me', and society",
+      "Reason, will, and appetite"
+    ],
+    correct: 1,
+    explain: "<b>Reciprocal Determinism</b> describes behavior, internal cognitive/personal factors, and environmental influences as mutually interacting determinants."
+  },
+  {
+    module: "V", subject: "Bandura",
+    q: "What is the correct order of the 4 steps in Bandura's Observational Learning (Modeling)?",
+    options: [
+      "Motivation → Attention → Retention → Reproduction",
+      "Attention → Retention → Reproduction → Motivation",
+      "Retention → Attention → Motivation → Reproduction",
+      "Attention → Motivation → Retention → Reproduction"
+    ],
+    correct: 1,
+    explain: "Observational learning proceeds: <b>Attention</b> (noticing the model) → <b>Retention</b> (remembering it) → <b>Reproduction</b> (ability to perform it) → <b>Motivation</b> (desire to do it)."
+  },
+  {
+    module: "V", subject: "Bandura",
+    q: "An individual's belief in their own ability to execute the actions required to succeed in a specific situation is called:",
+    options: ["Self-efficacy", "Self-regulation", "Outcome expectation", "Proxy agency"],
+    correct: 0,
+    explain: "<b>Self-efficacy</b> is belief in one's ability to succeed at a task; higher self-efficacy leads to greater perseverance through obstacles."
+  },
+  {
+    module: "V", subject: "Bandura",
+    q: "Bandura's Self-System regulates behavior through three sub-processes. Which of the following is NOT one of them?",
+    options: ["Self-Observation", "Judgmental Processes", "Self-Response", "Collective Efficacy"],
+    correct: 3,
+    explain: "The Self-System's three sub-processes are <b>Self-Observation, Judgmental Processes, and Self-Response</b>. Collective Efficacy is a separate concept — shared belief in a group's ability to work together."
+  },
+  {
+    module: "V", subject: "Bandura",
+    q: "When a person seeks external assistance or relies on others to help achieve a goal, Bandura calls this:",
+    options: ["Self-Reflective Capability", "Proxy Agency", "Self-Regulation", "Outcome Expectation"],
+    correct: 1,
+    explain: "<b>Proxy Agency</b> is relying on others or seeking external assistance to achieve goals, distinct from acting entirely through one's own effort."
+  },
+];
+
+const TOTAL = QUESTIONS.length;
+let current = 0;
+let score = 0;
+let answered = false;
+const results = []; // {module, correct:bool}
+
+const rail = document.getElementById('rail');
+const modules = ["I","II","III","IV","V"];
+modules.forEach(m=>{
+  const d = document.createElement('div');
+  d.className = 'tab';
+  d.textContent = m;
+  d.dataset.mod = m;
+  rail.appendChild(d);
+});
+
+const qTag = document.getElementById('qTag');
+const qCounter = document.getElementById('qCounter');
+const qText = document.getElementById('qText');
+const qOptions = document.getElementById('qOptions');
+const qExplain = document.getElementById('qExplain');
+const nextBtn = document.getElementById('nextBtn');
+const quizWrap = document.getElementById('quizWrap');
+const resultsEl = document.getElementById('results');
+
+const MODULE_NAMES = {
+  I: "Philosophy",
+  II: "Sociology",
+  III: "Anthropology",
+  IV: "Psychology · Mead",
+  V: "Psychology · Bandura"
+};
+
+function updateRail(){
+  const tabs = rail.querySelectorAll('.tab');
+  tabs.forEach(t=>{
+    t.classList.remove('active','done');
+    const idxOfModule = QUESTIONS.findIndex(q=>q.module===t.dataset.mod);
+    const doneAll = results.filter(r=>r.module===t.dataset.mod).length ===
+                    QUESTIONS.filter(q=>q.module===t.dataset.mod).length;
+    if(doneAll && results.length){ t.classList.add('done'); }
+  });
+  const activeMod = QUESTIONS[current] ? QUESTIONS[current].module : null;
+  if(activeMod){
+    const activeTab = [...tabs].find(t=>t.dataset.mod===activeMod);
+    if(activeTab) activeTab.classList.add('active');
+  }
+}
+
+function loadQuestion(){
+  answered = false;
+  const item = QUESTIONS[current];
+  qTag.textContent = `Module ${item.module} · ${MODULE_NAMES[item.module]}`;
+  qCounter.textContent = `${String(current+1).padStart(2,'0')} / ${TOTAL}`;
+  qText.textContent = item.q;
+  qExplain.classList.remove('show');
+  qExplain.innerHTML = '';
+  nextBtn.classList.remove('show');
+  qOptions.innerHTML = '';
+
+  const letters = ['A','B','C','D'];
+  item.options.forEach((opt, i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span><span>${opt}</span>`;
+    btn.addEventListener('click', ()=>selectAnswer(i, btn));
+    qOptions.appendChild(btn);
+  });
+
+  updateRail();
+}
+
+function selectAnswer(i, btn){
+  if(answered) return;
+  answered = true;
+  const item = QUESTIONS[current];
+  const allBtns = [...qOptions.querySelectorAll('.opt')];
+  const isCorrect = i === item.correct;
+  if(isCorrect) score++;
+  results.push({module:item.module, correct:isCorrect});
+
+  allBtns.forEach((b, idx)=>{
+    b.disabled = true;
+    if(idx === item.correct){ b.classList.add('correct'); }
+    else if(idx === i){ b.classList.add('wrong'); }
+    else { b.classList.add('dim'); }
+  });
+
+  qExplain.innerHTML = item.explain;
+  qExplain.classList.add('show');
+  nextBtn.classList.add('show');
+  nextBtn.textContent = current === TOTAL-1 ? 'See your results →' : 'Next fragment →';
+  updateRail();
+}
+
+nextBtn.addEventListener('click', ()=>{
+  current++;
+  if(current < TOTAL){
+    loadQuestion();
+  } else {
+    showResults();
+  }
+});
+
+function showResults(){
+  quizWrap.classList.add('hide');
+  resultsEl.classList.add('show');
+
+  document.getElementById('scoreNum').innerHTML = `${score}<span>/${TOTAL}</span>`;
+  const pct = score / TOTAL;
+  let verdict = "Keep examining";
+  if(pct === 1) verdict = "Fully enlightened";
+  else if(pct >= 0.8) verdict = "Deeply self-aware";
+  else if(pct >= 0.6) verdict = "Well on your way";
+  else if(pct >= 0.4) verdict = "The dialogue continues";
+  document.getElementById('verdict').textContent = verdict;
+
+  const breakdown = document.getElementById('breakdown');
+  breakdown.innerHTML = '';
+  modules.forEach(m=>{
+    const modResults = results.filter(r=>r.module===m);
+    const modCorrect = modResults.filter(r=>r.correct).length;
+    const modTotal = modResults.length;
+    const pctW = modTotal ? Math.round((modCorrect/modTotal)*100) : 0;
+    const row = document.createElement('div');
+    row.className = 'b-row';
+    row.innerHTML = `
+      <span class="b-label">${m} · ${MODULE_NAMES[m]}</span>
+      <span class="b-track"><span class="b-fill" style="width:${pctW}%"></span></span>
+      <span class="b-frac">${modCorrect}/${modTotal}</span>
+    `;
+    breakdown.appendChild(row);
+  });
+}
+
+document.getElementById('retryBtn').addEventListener('click', ()=>{
+  current = 0; score = 0; answered = false;
+  results.length = 0;
+  resultsEl.classList.remove('show');
+  quizWrap.classList.remove('hide');
+  loadQuestion();
+});
+
+loadQuestion();
+</script>
+
+</body>
+</html>
